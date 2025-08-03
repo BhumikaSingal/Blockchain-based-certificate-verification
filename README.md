@@ -1,4 +1,3 @@
-# Blockchain-based-certificate-verification
 # Blockchain Certificate Verifier
 
 Verify and issue certificates on the blockchain (Polygon Mumbai/Ethereum testnet).
