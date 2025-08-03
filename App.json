@@ -1,0 +1,67 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [form, setForm] = useState({ recipientName: '', certificateHash: '' });
+  const [certId, setCertId] = useState('');
+  const [verification, setVerification] = useState(null);
+
+  const handleIssue = async () => {
+    try {
+      const res = await axios.post('http://localhost:4000/issue', form);
+      alert('Certificate issued! Tx: ' + res.data.txHash + '\nCertificate ID: ' + res.data.certId);
+    } catch (err) {
+      alert('Error issuing certificate: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleVerify = async () => {
+    try {
+      const res = await axios.post('http://localhost:4000/verify', { certId, certificateHash: form.certificateHash });
+      setVerification(res.data.valid);
+    } catch (err) {
+      alert('Error verifying certificate: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  return (
+    <div style={{ padding: 40, maxWidth: 600, margin: 'auto', fontFamily: 'sans-serif' }}>
+      <h1>Blockchain Certificate Verifier</h1>
+      <div style={{ marginBottom: 32 }}>
+        <h3>Issue Certificate</h3>
+        <input
+          placeholder="Recipient Name"
+          onChange={e => setForm({ ...form, recipientName: e.target.value })}
+          style={{ width: '100%', marginBottom: 8 }}
+        />
+        <input
+          placeholder="Certificate Hash"
+          onChange={e => setForm({ ...form, certificateHash: e.target.value })}
+          style={{ width: '100%', marginBottom: 8 }}
+        />
+        <button onClick={handleIssue}>Issue</button>
+      </div>
+      <div>
+        <h3>Verify Certificate</h3>
+        <input
+          placeholder="Certificate ID"
+          onChange={e => setCertId(e.target.value)}
+          style={{ width: '100%', marginBottom: 8 }}
+        />
+        <input
+          placeholder="Certificate Hash"
+          onChange={e => setForm({ ...form, certificateHash: e.target.value })}
+          style={{ width: '100%', marginBottom: 8 }}
+        />
+        <button onClick={handleVerify}>Verify</button>
+        {verification !== null && (
+          <div style={{ marginTop: 12, fontWeight: 'bold' }}>
+            {verification ? '✅ Valid Certificate' : '❌ Invalid Certificate'}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
